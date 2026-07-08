@@ -1,0 +1,12 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>便當點餐</title></head>
+<body style="font-family:sans-serif;text-align:center;padding-top:80px;color:#333">
+<p style="font-size:18px">正在前往今日點餐頁…</p>
+<p id="err" style="color:#999"></p>
+<script>
+fetch('link.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+  if(d.url){location.replace(d.url)}
+  else{document.getElementById('err').textContent='今日尚未開單,請稍後再試'}
+}).catch(()=>{document.getElementById('err').textContent='載入失敗,請重新整理'});
+</script></body></html>
