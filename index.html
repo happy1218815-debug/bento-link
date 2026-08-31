@@ -1,12 +1,38 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>便當點餐</title></head>
-<body style="font-family:sans-serif;text-align:center;padding-top:80px;color:#333">
-<p style="font-size:18px">正在前往今日點餐頁…</p>
-<p id="err" style="color:#999"></p>
+<title>便當點餐</title><style>
+body{font-family:'Microsoft JhengHei',sans-serif;margin:0;background:#f5f2ea;color:#333}
+.wrap{max-width:420px;margin:0 auto;padding:60px 20px;text-align:center}
+.card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:28px 20px}
+.big{font-size:22px;font-weight:bold;color:#c62828;margin-bottom:10px}
+.mid{font-size:17px;margin:6px 0}
+.line{display:inline-block;margin-top:16px;background:#06c755;color:#fff;
+  border-radius:22px;padding:10px 26px;font-size:16px;text-decoration:none}
+.tip{font-size:13px;color:#999;margin-top:20px;line-height:1.7}
+.btn{margin-top:10px;background:#fff;border:1px solid #ccc;border-radius:8px;
+  padding:8px 18px;font-size:14px;cursor:pointer}
+</style></head>
+<body><div class="wrap"><div class="card" id="box">
+<p class="mid">正在前往今日點餐頁…</p>
+</div></div>
 <script>
-fetch('link.json?t='+Date.now()).then(r=>r.json()).then(d=>{
-  if(d.url){location.replace(d.url)}
-  else{document.getElementById('err').textContent='今日尚未開單,請稍後再試'}
-}).catch(()=>{document.getElementById('err').textContent='載入失敗,請重新整理'});
+var OUT='<div class="big">陳維尼今天外出</div>'
+ +'<div class="mid">無法使用點餐系統</div><div class="mid">請用 LINE 和維尼點餐</div>'
+ +'<div class="tip">如果維尼剛開機,請稍等 1~2 分鐘再試。</div>'
+ +'<button class="btn" onclick="location.reload()">重新整理</button>';
+function out(){document.getElementById('box').innerHTML=OUT;}
+function alive(u){
+  return new Promise(function(res){
+    var done=false;
+    var t=setTimeout(function(){if(!done){done=true;res(false);}},7000);
+    fetch(u+'/ping?t='+Date.now(),{cache:'no-store'}).then(function(r){
+      if(!done){done=true;clearTimeout(t);res(r.ok);}
+    }).catch(function(){if(!done){done=true;clearTimeout(t);res(false);}});
+  });
+}
+fetch('link.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();})
+.then(function(d){
+  if(!d||!d.url){out();return;}
+  alive(d.url).then(function(ok){ok?location.replace(d.url):out();});
+}).catch(function(){out();});
 </script></body></html>
